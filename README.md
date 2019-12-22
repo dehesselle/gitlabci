@@ -25,12 +25,31 @@ Uses ANSI codes for all output operations. Updates every 2 minutes.
 
 ## Usage
 
+### Prerequisites
+
 You need [python-gitlab](https://python-gitlab.readthedocs.io/en/stable/index.html) and [sty](https://sty.mewo.dev/index.html) packages.
 
 ```bash
 pip3 install python-gitlab   # GitLab API
 pip3 install sty             # ANSI control for terminal colors
 ```
+
+### Configuration
+
+Create a file `jobmon.ini` to configure:
+
+```ini
+[gitlab]
+server = https://gitlab.com
+project_id = 1234567
+ci_job = someName
+access_token = secret
+
+[jobmon]
+update = 120
+```
+
+### Three, two, one ... go!
 
 > TODO documentation missing
 

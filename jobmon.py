@@ -4,22 +4,15 @@ import gitlab
 import os
 from datetime import datetime, timedelta
 import time
-from sty import fg, ef, rs
+from sty import fg
 import signal
 import sys
+import argparse
+import configparser
 
 
-def get_file_content(file_name):
-    file = open(file_name)
-    content = file.read()
-    file.close()
-    return content.rstrip()    # remove trailing newline
-
-
-def get_project(project_id):
-    token_file = os.getenv("HOME") + "/.local/etc/gitlab/python-gitlab"
-    get_file_content(token_file)
-    gl = gitlab.Gitlab("https://gitlab.com", private_token=get_file_content(token_file))
+def get_project(project_id, server, token):
+    gl = gitlab.Gitlab(server, private_token=token)
     return gl.projects.get(project_id)
 
 
@@ -73,7 +66,7 @@ def print_jobs(project, job_name):
                 print(get_status_color(job.status)
                       + get_datetime(job.created_at).strftime("%y%m%d-%H%M%S")
                       + fg.rs,
-                      "·",
+                      " ",
                       fg(248) + get_minutes_between(job.created_at, job.started_at) + fg.rs,
                       "·",
                       fg(248) + get_minutes_between(job.started_at, job.finished_at) + fg.rs, " ",
@@ -96,15 +89,48 @@ def handle_signal(signal, frame):
     sys.exit(0)
 
 
+def create_ini():
+    ini = configparser.ConfigParser()
+    ini["gitlab"] = {"server": "https://gitlab.com",
+                     "project_id": "12345678",
+                     "ci_job": "foo",
+                     "access_token": "API_access_token"}
+    ini["jobmon"] = {"update": "120"}
+
+    with open(os.getenv("HOME") + "/" + "jobmon.ini", "w") as ini_file:
+        ini.write(ini_file)
+
+
 def main():
-    seconds = 120
     signal.signal(signal.SIGINT, handle_signal)
+
+    parser = argparse.ArgumentParser(description="monitor CI jobs")
+    parser.add_argument("-f", "--file", metavar="file")
+    args = parser.parse_args()
+
+    if args.file is None:  # use default path for .ini
+        ini_file = os.getenv("HOME") + "/" + "jobmon.ini"
+    else:                  # use custom path
+        ini_file = args.file
+        if not os.path.exists(ini_file):
+            print("invalid configuration file:", ini_file)
+            sys.exit(1)
+
+    ini = configparser.ConfigParser()
+    ini.read(ini_file)
+
+    project_id = ini["gitlab"]["project_id"]
+    ci_job = ini["gitlab"]["ci_job"]
+    server = ini["gitlab"]["server"]
+    token = ini["gitlab"]["access_token"]
+    seconds = int(ini["jobmon"]["update"])
+
     clear_screen()
     while True:
         move_cursor(1, 1)
         dt_now = datetime.now()
         print("this:", dt_now.strftime("%Y.%m.%d %H:%M:%S"), "\n")
-        print_jobs(get_project(3472737), "inkscape:mac")
+        print_jobs(get_project(project_id, server, token), ci_job)
         print("\nnext:", (dt_now + timedelta(seconds=seconds)).strftime("%Y.%m.%d %H:%M:%S"), "--- Ctrl+C to exit")
         time.sleep(seconds)
 
