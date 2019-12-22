@@ -1,7 +1,10 @@
 import gitlab
 import os
-from datetime import datetime
+from datetime import datetime, timedelta
+import time
 from sty import fg
+import signal
+import sys
 
 
 def get_file_content(file_name):
@@ -55,25 +58,51 @@ def get_status_color(status):
         return fg.rs
 
 
+def get_fixed_str(text, length):
+    if len(text) > length:
+        text = text[:length-3] + "..."
+    return text.ljust(length)
+
 def print_jobs(project, job_name):
     for pipeline in project.pipelines.list():
         for job in pipeline.jobs.list():
             if job.name == job_name:   # only interested in specific job_name
-                commit_title = job.commit["title"]
-                if len(commit_title) > 52:
-                    commit_title = commit_title[:49] + "..."
-                commit_title = commit_title.ljust(52)
-
                 print(get_status_color(job.status)
                       + get_datetime(job.created_at).strftime("%y%m%d-%H%M%S")
                       + fg.rs, "·",
                       fg(248) + get_minutes_between(job.created_at, job.started_at) + fg.rs, "·",
                       fg(248) + get_minutes_between(job.started_at, job.finished_at) + fg.rs, " ",
+                      fg(131) + get_fixed_str(pipeline.ref, 10) + fg.rs, " ",
                       fg(205) + job.commit["short_id"] + fg.rs, " ",
-                      fg(33) + commit_title + fg.rs, " ",
+                      fg(33) + get_fixed_str(job.commit["title"], 52) + fg.rs, " ",
                       fg.li_black + job.user["name"] + fg.rs,
                       sep="")
 
 
+def move_cursor(x, y):  # https://stackoverflow.com/a/54630943
+    print("\033[%d;%dH" % (y, x))
+
+
+def clear_screen():  # https://stackoverflow.com/a/2084521
+    print(chr(27) + "[2J")
+
+
+def handle_signal(signal, frame):
+    sys.exit(0)
+
+
+def main():
+    seconds = 120
+    signal.signal(signal.SIGINT, handle_signal)
+    clear_screen()
+    while True:
+        move_cursor(1, 1)
+        print(" now:", datetime.now().strftime("%Y.%m.%d %H:%M:%S"), "\n")
+        print_jobs(get_project(3472737), "inkscape:mac")
+        dt = datetime.now() + timedelta(seconds=seconds)
+        print("\nnext:", dt.strftime("%Y.%m.%d %H:%M:%S"), "--- Ctrl+C to exit")
+        time.sleep(60)
+
+
 if __name__ == '__main__':
-    print_jobs(get_project(3472737), "inkscape:mac")
+    main()
