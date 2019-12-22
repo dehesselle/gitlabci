@@ -34,7 +34,7 @@ def get_minutes_between(gitlab_timestamp1, gitlab_timestamp2):
         if minutes > 999:
             minutes = 999
         minutes = str(minutes).zfill(3)
-    except ValueError:
+    except (ValueError, TypeError) as e:
         minutes = "..."
     return minutes
 
@@ -64,13 +64,6 @@ def get_fixed_str(text, length):
     return text.ljust(length)
 
 
-def get_status_blinking(status):
-    if status == "running":
-        return ef.blink
-    else:
-        return rs.blink
-
-
 def print_jobs(project, job_name):
     for pipeline in project.pipelines.list():
         for job in pipeline.jobs.list():
@@ -78,9 +71,9 @@ def print_jobs(project, job_name):
                 print(get_status_color(job.status)
                       + get_datetime(job.created_at).strftime("%y%m%d-%H%M%S")
                       + fg.rs,
-                      get_status_blinking(job.status) + "·" + rs.blink,
+                      "·",
                       fg(248) + get_minutes_between(job.created_at, job.started_at) + fg.rs,
-                      get_status_blinking(job.status) + "·" + rs.blink,
+                      "·",
                       fg(248) + get_minutes_between(job.started_at, job.finished_at) + fg.rs, " ",
                       fg(131) + get_fixed_str(pipeline.ref, 10) + fg.rs, " ",
                       fg(205) + job.commit["short_id"] + fg.rs, " ",
