@@ -97,11 +97,11 @@ def main():
     clear_screen()
     while True:
         move_cursor(1, 1)
-        print(" now:", datetime.now().strftime("%Y.%m.%d %H:%M:%S"), "\n")
+        dt_now = datetime.now()
+        print(" now:", dt_now.strftime("%Y.%m.%d %H:%M:%S"), "\n")
         print_jobs(get_project(3472737), "inkscape:mac")
-        dt = datetime.now() + timedelta(seconds=seconds)
-        print("\nnext:", dt.strftime("%Y.%m.%d %H:%M:%S"), "--- Ctrl+C to exit")
-        time.sleep(60)
+        print("\nnext:", (dt_now + timedelta(seconds=seconds)).strftime("%Y.%m.%d %H:%M:%S"), "--- Ctrl+C to exit")
+        time.sleep(seconds)
 
 
 if __name__ == '__main__':
