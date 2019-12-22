@@ -75,7 +75,7 @@ def print_jobs(project, job_name):
                       fg(131) + get_fixed_str(pipeline.ref, 10) + fg.rs, " ",
                       fg(205) + job.commit["short_id"] + fg.rs, " ",
                       fg(33) + get_fixed_str(job.commit["title"], 52) + fg.rs, " ",
-                      fg.li_black + job.user["name"] + fg.rs,
+                      fg.li_black + get_fixed_str(job.user["name"], 16) + fg.rs,
                       sep="")
 
 
