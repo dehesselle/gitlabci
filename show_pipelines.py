@@ -2,7 +2,7 @@ import gitlab
 import os
 from datetime import datetime, timedelta
 import time
-from sty import fg
+from sty import fg, ef, rs
 import signal
 import sys
 
@@ -60,8 +60,16 @@ def get_status_color(status):
 
 def get_fixed_str(text, length):
     if len(text) > length:
-        text = text[:length-3] + "..."
+        text = text[:length-1] + "…"
     return text.ljust(length)
+
+
+def get_status_blinking(status):
+    if status == "running":
+        return ef.blink
+    else:
+        return rs.blink
+
 
 def print_jobs(project, job_name):
     for pipeline in project.pipelines.list():
@@ -69,8 +77,10 @@ def print_jobs(project, job_name):
             if job.name == job_name:   # only interested in specific job_name
                 print(get_status_color(job.status)
                       + get_datetime(job.created_at).strftime("%y%m%d-%H%M%S")
-                      + fg.rs, "·",
-                      fg(248) + get_minutes_between(job.created_at, job.started_at) + fg.rs, "·",
+                      + fg.rs,
+                      get_status_blinking(job.status) + "·" + rs.blink,
+                      fg(248) + get_minutes_between(job.created_at, job.started_at) + fg.rs,
+                      get_status_blinking(job.status) + "·" + rs.blink,
                       fg(248) + get_minutes_between(job.started_at, job.finished_at) + fg.rs, " ",
                       fg(131) + get_fixed_str(pipeline.ref, 10) + fg.rs, " ",
                       fg(205) + job.commit["short_id"] + fg.rs, " ",
@@ -98,7 +108,7 @@ def main():
     while True:
         move_cursor(1, 1)
         dt_now = datetime.now()
-        print(" now:", dt_now.strftime("%Y.%m.%d %H:%M:%S"), "\n")
+        print("this:", dt_now.strftime("%Y.%m.%d %H:%M:%S"), "\n")
         print_jobs(get_project(3472737), "inkscape:mac")
         print("\nnext:", (dt_now + timedelta(seconds=seconds)).strftime("%Y.%m.%d %H:%M:%S"), "--- Ctrl+C to exit")
         time.sleep(seconds)
