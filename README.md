@@ -11,7 +11,7 @@ There are 6 columns:
   - yellow for running jobs
   - green for successfully completed jobs
   - red for failed jobs
-- ___combined "job started" and "job finished"___ column, each as 3-digit values in minutes since job creation and job start
+- ___combined "job started" and "job finished"___ column, each as 3-digit value in "minutes since job creation" and "minutes since job start" in `NNN·NNN` format
 - ___git reference___ column, limited to 10 chars
 - ___commit hash___ column, short form
 - ___commit message___ column, first line only and limited to 52 chars
@@ -21,22 +21,22 @@ And this is what it looks like with pending and running jobs.
 
 ![foo](/monitor2.png)
 
-Uses ANSI codes for all output operations. Updates every 2 minutes.
-
 ## Usage
 
 ### Prerequisites
 
-You need [python-gitlab](https://python-gitlab.readthedocs.io/en/stable/index.html) and [sty](https://sty.mewo.dev/index.html) packages.
+- You need [python-gitlab](https://python-gitlab.readthedocs.io/en/stable/index.html) and [sty](https://sty.mewo.dev/index.html) packages.
 
-```bash
-pip3 install python-gitlab   # GitLab API
-pip3 install sty             # ANSI control for terminal colors
-```
+  ```bash
+  pip3 install python-gitlab   # GitLab API
+  pip3 install sty             # ANSI control for terminal colors
+  ```
+
+- Terminal with support for ANSI control characters and 256 colors.
 
 ### Configuration
 
-Create a file `jobmon.ini` to configure:
+Create a file `$HOME/jobmon.ini` to configure:
 
 ```ini
 [gitlab]
@@ -49,9 +49,19 @@ access_token = secret
 update = 120
 ```
 
-### Three, two, one ... go!
+### Three, two, one ... go
 
-> TODO documentation missing
+Run the script:
+
+```bash
+./jobmon.py
+```
+
+You can also use a custom file/path for your configuration:
+
+```bash
+./jobmon.py -f <your configuration file>
+```
 
 ## Status
 
