@@ -78,9 +78,8 @@ def print_jobs(project, job_name: str) -> None:
                       + get_datetime(job.created_at).strftime("%y%m%d-%H%M%S")
                       + fg.rs,
                       " ",
-                      fg(248) + get_minutes_between(job.created_at, job.started_at) + fg.rs,
-                      "·",
-                      fg(248) + get_minutes_between(job.started_at, job.finished_at) + fg.rs, " ",
+                      fg(248) + get_minutes_between(job.created_at, job.started_at) + "·"
+                      + get_minutes_between(job.started_at, job.finished_at) + fg.rs, " ",
                       fg(131) + get_fixed_str(pipeline.ref, 10) + fg.rs, " ",
                       fg(205) + job.commit["short_id"] + fg.rs, " ",
                       fg(33) + get_fixed_str(job.commit["title"], 52) + fg.rs, " ",
