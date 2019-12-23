@@ -154,8 +154,10 @@ def main():
     while True:
         move_cursor(1, 1)
         dt_now = datetime.now()
-        print("this:", dt_now.strftime("%Y.%m.%d %H:%M:%S"), "\n")
-        print_jobs(get_project(project_id, server, token), ci_job)
+        project = get_project(project_id, server, token)
+        print("this:", dt_now.strftime("%Y.%m.%d %H:%M:%S"), "---",
+              fg(230) + ci_job + fg.rs, "on", project.web_url, "\n")
+        print_jobs(project, ci_job)
         print("\nnext:", (dt_now + timedelta(seconds=seconds)).strftime("%Y.%m.%d %H:%M:%S"), "--- Ctrl+C to exit")
         time.sleep(seconds)
 
