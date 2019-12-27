@@ -112,7 +112,7 @@ def create_ini():
                      "access_token": "API_access_token"}
     ini["jobmon"] = {"update": "120"}
 
-    with open(os.getenv("HOME") + "/" + "jobmon.ini", "w") as ini_file:
+    with open(os.getenv("HOME") + "/.local/etc/jobmon.ini", "w") as ini_file:
         ini.write(ini_file)
 
 
@@ -133,7 +133,7 @@ def main():
     args = parser.parse_args()
 
     if args.file is None:  # use default path for .ini
-        ini_file = os.getenv("HOME") + "/" + "jobmon.ini"
+        ini_file = os.getenv("HOME") + "/.local/etc/jobmon.ini";
     else:                  # use custom path
         ini_file = args.file
         if not os.path.exists(ini_file):
@@ -161,6 +161,10 @@ def main():
         print("".ljust(111))  # empty line
         print(("next: " + (dt_now + timedelta(seconds=seconds)).strftime("%Y.%m.%d %H:%M:%S")
                + " --- Ctrl+C to exit").ljust(110))
+
+        if "PYCHARM_HOSTED" in os.environ:
+            break   # no endless loop when developing
+
         time.sleep(seconds)
 
 
