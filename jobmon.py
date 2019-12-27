@@ -11,7 +11,7 @@ from sty import fg
 import signal
 import sys
 import argparse
-import configparser
+import IniFile
 
 
 def get_project(project_id: str, server: str, token: str):
@@ -104,18 +104,6 @@ def handle_signal(signal, frame):
     sys.exit(0)
 
 
-def create_ini():
-    ini = configparser.ConfigParser()
-    ini["gitlab"] = {"server": "https://gitlab.com",
-                     "project_id": "12345678",
-                     "ci_job": "foo",
-                     "access_token": "API_access_token"}
-    ini["jobmon"] = {"update": "120"}
-
-    with open(os.getenv("HOME") + "/.local/etc/jobmon.ini", "w") as ini_file:
-        ini.write(ini_file)
-
-
 def main():
     # - Install signal handler to catch SIGINT, because we're going to use an
     #   endless loop the user has to quit with Ctrl+C.
@@ -133,15 +121,15 @@ def main():
     args = parser.parse_args()
 
     if args.file is None:  # use default path for .ini
-        ini_file = os.getenv("HOME") + "/.local/etc/jobmon.ini";
+        file = os.getenv("HOME") + "/.local/etc/jobmon.ini";
     else:                  # use custom path
-        ini_file = args.file
-        if not os.path.exists(ini_file):
-            print("invalid configuration file:", ini_file)
+        file = args.file
+        if not os.path.exists(file):
+            print("invalid configuration file:", file)
             sys.exit(1)
 
-    ini = configparser.ConfigParser()
-    ini.read(ini_file)
+    ini_file = IniFile.IniFile(file)
+    ini = ini_file.cp
 
     project_id = ini["gitlab"]["project_id"]
     ci_job = ini["gitlab"]["ci_job"]
