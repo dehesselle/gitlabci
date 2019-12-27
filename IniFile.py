@@ -6,9 +6,8 @@ import errno
 class IniFile:
     def __init__(self, filename):
         self.filename = filename
-
+        self.cp = configparser.ConfigParser()
         if os.path.exists(filename):
-            self.cp = configparser.ConfigParser()
             self.cp.read(filename)
 
     def __del__(self):
@@ -17,6 +16,15 @@ class IniFile:
 
     def __getitem__(self, item):
         return self.cp[item]
+
+    def __contains__(self, key):
+        return self.cp.__contains__(key)
+
+    def __setitem__(self, item1, item2="", item3=""):
+        if not item3:
+            self.cp[item1] = item2
+        else:
+            self.cp[item1][item2] = item3
 
 
 class GitlabIni(IniFile):
