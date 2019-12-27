@@ -154,10 +154,13 @@ def main():
         move_cursor(1, 1)
         dt_now = datetime.now()
         project = get_project(project_id, server, token)
-        print("this:", dt_now.strftime("%Y.%m.%d %H:%M:%S"), "---",
-              fg(230) + ci_job + fg.rs, "on", project.web_url, "\n")
+        print(("this: " + dt_now.strftime("%Y.%m.%d %H:%M:%S") + " --- "
+              + fg(230) + ci_job + fg.rs + " on " + project.web_url).ljust(111))
+        print("".ljust(111))  # empty line
         print_jobs(project, ci_job)
-        print("\nnext:", (dt_now + timedelta(seconds=seconds)).strftime("%Y.%m.%d %H:%M:%S"), "--- Ctrl+C to exit")
+        print("".ljust(111))  # empty line
+        print(("next: " + (dt_now + timedelta(seconds=seconds)).strftime("%Y.%m.%d %H:%M:%S")
+               + " --- Ctrl+C to exit").ljust(110))
         time.sleep(seconds)
 
 
