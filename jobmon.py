@@ -120,15 +120,11 @@ def main():
     parser.add_argument("-f", "--file", metavar="file")
     args = parser.parse_args()
 
-    if args.file is None:  # use default path for .ini
-        file = os.getenv("HOME") + "/.local/etc/jobmon.ini";
-    else:                  # use custom path
-        file = args.file
-        if not os.path.exists(file):
-            print("invalid configuration file:", file)
-            sys.exit(1)
+    if args.file is None:
+        gl = IniFile.GitlabIni()           # use default path
+    else:
+        gl = IniFile.GitlabIni(args.file)  # use custom path
 
-    gl = IniFile.GitlabIni()
     jm = IniFile.IniFile(os.getenv("HOME") + "/.local/etc/jobmon.ini")
 
     seconds = int(jm["jobmon"]["update"])

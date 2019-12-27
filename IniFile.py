@@ -1,5 +1,6 @@
 import configparser
 import os
+import errno
 
 
 class IniFile:
@@ -19,8 +20,16 @@ class IniFile:
 
 
 class GitlabIni(IniFile):
-    def __init__(self):
-        IniFile.__init__(self, os.getenv("HOME") + "/.local/etc/gitlab.ini")
+    def __init__(self, filename=""):
+        if os.path.exists(filename):
+            IniFile.__init__(self, filename)
+        else:
+            filename = os.getenv("HOME") + "/.local/etc/gitlab.ini"
+            if os.path.exists(filename):
+                IniFile.__init__(self, filename)
+            else:
+                raise FileNotFoundError(errno.ENOENT, os.strerror(errno.ENOENT), filename)
+
         self.project_id = self["gitlab"]["project_id"]
         self.ci_job = self["gitlab"]["ci_job"]
         self.server = self["gitlab"]["server"]
