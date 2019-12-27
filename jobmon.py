@@ -128,24 +128,20 @@ def main():
             print("invalid configuration file:", file)
             sys.exit(1)
 
-    ini_file = IniFile.IniFile(file)
-    ini = ini_file.cp
+    gl = IniFile.GitlabIni()
+    jm = IniFile.IniFile(os.getenv("HOME") + "/.local/etc/jobmon.ini")
 
-    project_id = ini["gitlab"]["project_id"]
-    ci_job = ini["gitlab"]["ci_job"]
-    server = ini["gitlab"]["server"]
-    token = ini["gitlab"]["access_token"]
-    seconds = int(ini["jobmon"]["update"])
+    seconds = int(jm["jobmon"]["update"])
 
     clear_screen()
     while True:
         move_cursor(1, 1)
         dt_now = datetime.now()
-        project = get_project(project_id, server, token)
+        project = get_project(gl.project_id, gl.server, gl.token)
         print(("this: " + dt_now.strftime("%Y.%m.%d %H:%M:%S") + " --- "
-              + fg(230) + ci_job + fg.rs + " on " + project.web_url).ljust(111))
+              + fg(230) + gl.ci_job + fg.rs + " on " + project.web_url).ljust(111))
         print("".ljust(111))  # empty line
-        print_jobs(project, ci_job)
+        print_jobs(project, gl.ci_job)
         print("".ljust(111))  # empty line
         print(("next: " + (dt_now + timedelta(seconds=seconds)).strftime("%Y.%m.%d %H:%M:%S")
                + " --- Ctrl+C to exit").ljust(110))
