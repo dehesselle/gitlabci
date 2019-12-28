@@ -7,9 +7,23 @@ import os
 import datetime
 import IniFile
 import jobmon
+import argparse
+
+
+def get_ref():
+    parser = argparse.ArgumentParser(description="get unreleased job_id")
+    parser.add_argument('ref', metavar='ref', type=str, nargs='1',
+                        help='git ref to select job_id from')
+    args = parser.parse_args()
+    return args.ref
 
 
 def main():
+    if "PYCHARM_HOSTED" in os.environ:   # this is for testing only
+        ref = "master"
+    else:
+        ref = get_ref()
+
     gitlab = IniFile.GitlabIni()
     releases = IniFile.IniFile(os.getenv("HOME") + "/releases.log")
 
@@ -19,7 +33,7 @@ def main():
 
     for pipeline in project.pipelines.list():
         for job in pipeline.jobs.list():
-            if job.name == gitlab.ci_job:
+            if job.name == gitlab.ci_job and pipeline.ref == ref:
                 if job.status == "success":
                     if str(job.id) in releases:
                         break_loop = True
@@ -40,6 +54,7 @@ def main():
         releases[job_id]["created_at"] = job.created_at
         releases[job_id]["started_at"] = job.started_at
         releases[job_id]["finished_at"] = job.finished_at
+        releases[job_id]["ref"] = pipeline.ref
         print(job_id)
     else:
         print(0)
