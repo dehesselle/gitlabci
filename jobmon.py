@@ -69,22 +69,25 @@ def get_fixed_str(text: str, length: int) -> str:
 
 
 def print_jobs(project, job_name: str) -> None:
+    line_count = 0
     # Print some details about every job matching 'job_name' of every pipeline.
     # By default, "every pipeline" are in fact  the last 18 pipelines.
     for pipeline in project.pipelines.list():
         for job in pipeline.jobs.list():
             if job.name == job_name:   # only interested in specific job_name
-                print(get_status_color(job.status)
-                      + get_datetime(job.created_at).strftime("%y%m%d-%H%M%S")
-                      + fg.rs,
-                      " ",
-                      fg(248) + get_minutes_between(job.created_at, job.started_at) + "·"
-                      + get_minutes_between(job.started_at, job.finished_at) + fg.rs, " ",
-                      fg(131) + get_fixed_str(pipeline.ref, 10) + fg.rs, " ",
-                      fg(205) + job.commit["short_id"] + fg.rs, " ",
-                      fg(33) + get_fixed_str(job.commit["title"], 52) + fg.rs, " ",
-                      fg.li_black + get_fixed_str(job.user["name"], 16) + fg.rs,
-                      sep="")
+                line_count += 1
+                if line_count <= 18:
+                    print(get_status_color(job.status)
+                          + get_datetime(job.created_at).strftime("%y%m%d-%H%M%S")
+                          + fg.rs,
+                          " ",
+                          fg(248) + get_minutes_between(job.created_at, job.started_at) + "·"
+                          + get_minutes_between(job.started_at, job.finished_at) + fg.rs, " ",
+                          fg(131) + get_fixed_str(pipeline.ref, 10) + fg.rs, " ",
+                          fg(205) + job.commit["short_id"] + fg.rs, " ",
+                          fg(33) + get_fixed_str(job.commit["title"], 52) + fg.rs, " ",
+                          fg.li_black + get_fixed_str(job.user["name"], 16) + fg.rs,
+                          sep="")
 
 
 def move_cursor(x, y):
