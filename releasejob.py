@@ -8,6 +8,7 @@ import datetime
 import IniFile
 import jobmon
 import argparse
+import errno
 
 
 def get_ref():
@@ -18,6 +19,18 @@ def get_ref():
     return args.ref
 
 
+class ReleaseLog(IniFile.IniFile):
+    def __init__(self, filename=""):
+        if os.path.exists(filename):
+            IniFile.IniFile.__init__(self, filename)
+        else:
+            filename = os.getenv("HOME") + "/releases.log"
+            if os.path.exists(filename):
+                IniFile.IniFile.__init__(self, filename)
+            else:
+                raise FileNotFoundError(errno.ENOENT, os.strerror(errno.ENOENT), filename)
+
+
 def main():
     if "PYCHARM_HOSTED" in os.environ:   # this is for testing only
         ref = "master"
@@ -25,7 +38,7 @@ def main():
         ref = get_ref()
 
     gitlab = IniFile.GitlabIni()
-    releases = IniFile.IniFile(os.getenv("HOME") + "/releases.log")
+    releases = ReleaseLog()
 
     project = jobmon.get_project(gitlab.project_id, gitlab.server, gitlab.token)
     break_loop = False
@@ -55,6 +68,7 @@ def main():
         releases[job_id]["started_at"] = job.started_at
         releases[job_id]["finished_at"] = job.finished_at
         releases[job_id]["ref"] = pipeline.ref
+        releases[job_id]["short_id"] = job.commit["short_id"]
         print(job_id)
     else:
         print(0)
