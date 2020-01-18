@@ -29,14 +29,16 @@ class IniFile:
 
 class GitlabIni(IniFile):
     def __init__(self, filename=""):
+        if not filename:   # Use default filename?
+            config_dir = os.getenv("XDG_CONFIG_HOME")
+            if not config_dir:
+                config_dir = os.getenv("HOME") + "/.config"
+            filename = config_dir + "/gitlabci.ini"
+
         if os.path.exists(filename):
             IniFile.__init__(self, filename)
         else:
-            filename = os.getenv("HOME") + "/.local/etc/gitlab.ini"
-            if os.path.exists(filename):
-                IniFile.__init__(self, filename)
-            else:
-                raise FileNotFoundError(errno.ENOENT, os.strerror(errno.ENOENT), filename)
+            raise FileNotFoundError(errno.ENOENT, os.strerror(errno.ENOENT), filename)
 
         self.project_id = self["gitlab"]["project_id"]
         self.ci_job = self["gitlab"]["ci_job"]
