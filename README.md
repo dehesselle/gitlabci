@@ -32,6 +32,14 @@ Print a self-updating status page about specific GitLab CI jobs in the terminal.
 
 ![jobmon1](/docs/jobmon1.png)
 
+### [artifacts_by_sha](/docs/artifacts_by_sha.md)
+
+Get a list of all CI artifacts for a given commit hash.
+
+![artifacts_by_sha1](/docs/artifacts_by_sha1.png)
+
+
+
 ## License
 
 [MIT](LICENSE)
