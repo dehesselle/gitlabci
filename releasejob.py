@@ -5,7 +5,7 @@
 
 import os
 import datetime
-import IniFile
+from common import IniFile
 import jobmon
 import argparse
 import errno
@@ -46,7 +46,7 @@ def main():
 
     for pipeline in project.pipelines.list():
         for job in pipeline.jobs.list():
-            if job.name == gitlab.ci_job and pipeline.ref == ref:
+            if job.name == gitlab["jobmon"]["ci_job"] and pipeline.ref == ref:
                 if job.status == "success":
                     if str(job.id) in releases:
                         break_loop = True
