@@ -41,6 +41,5 @@ class GitlabIni(IniFile):
             raise FileNotFoundError(errno.ENOENT, os.strerror(errno.ENOENT), filename)
 
         self.project_id = self["gitlab"]["project_id"]
-        self.ci_job = self["gitlab"]["ci_job"]
         self.server = self["gitlab"]["server"]
         self.token = self["gitlab"]["access_token"]

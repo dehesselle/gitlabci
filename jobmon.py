@@ -3,11 +3,11 @@
 # Licensed under MIT.
 # https://github.com/dehesselle/gljobmon
 
-import gitlab
+import gitlab   # pip install python-gitlab
 import os
 from datetime import datetime, timedelta
 import time
-from sty import fg
+from sty import fg   # pip install sty
 import signal
 import sys
 import argparse
@@ -138,9 +138,9 @@ def main():
         dt_now = datetime.now()
         project = get_project(gl.project_id, gl.server, gl.token)
         print(("this: " + dt_now.strftime("%Y.%m.%d %H:%M:%S") + " --- "
-              + fg(230) + gl.ci_job + fg.rs + " on " + project.web_url).ljust(111))
+              + fg(230) + jm["jobmon"]["ci_job"] + fg.rs + " on " + project.web_url).ljust(111))
         print("".ljust(111))  # empty line
-        print_jobs(project, gl.ci_job)
+        print_jobs(project, jm["jobmon"]["ci_job"])
         print("".ljust(111))  # empty line
         print(("next: " + (dt_now + timedelta(seconds=seconds)).strftime("%Y.%m.%d %H:%M:%S")
                + " --- Ctrl+C to exit").ljust(110))
