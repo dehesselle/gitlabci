@@ -12,6 +12,8 @@ import signal
 import sys
 import argparse
 from common import IniFile
+from common.get_status_color import *
+from common.get_fixed_string import *
 
 
 def get_project(project_id: str, server: str, token: str):
@@ -39,33 +41,6 @@ def get_minutes_between(gitlab_timestamp1: str, gitlab_timestamp2: str) -> str:
     except (ValueError, TypeError) as e:
         minutes = "..."
     return minutes
-
-
-def get_status_color(status: str) -> str:
-    # Set a color depending on status.
-    if status == "pending":
-        return fg(214)  # orange
-    elif status == "created":
-        return fg.rs
-    elif status == "running":
-        return fg(226)  # yellow
-    elif status == "success":
-        return fg.green
-    elif status == "canceled":
-        return fg(124)  # dark red
-    elif status == "skipped":
-        return fg.li_black
-    elif status == "failed":
-        return fg(196)  # light red
-    else:
-        return fg.rs
-
-
-def get_fixed_str(text: str, length: int) -> str:
-    # Turn a string into a fixed-width string by either truncating or padding it.
-    if len(text) > length:
-        text = text[:length-1] + "…"
-    return text.ljust(length)
 
 
 def print_jobs(project, job_name: str) -> None:
