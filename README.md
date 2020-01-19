@@ -1,71 +1,36 @@
-# Job monitor for GitLab CI
+# little helpers for GitLab CI
 
-Print a self-updating status page about specific GitLab CI jobs in the terminal.
+This repository is a collection of little helpers and convenience functions using [python-gitlab](https://python-gitlab.readthedocs.io) to access GitLab's API. I'm doing this for myself and for a very specific use case, so don't expect these scripts to be all-rounders, they are not meant to be that.
 
-![foo](/monitor1.png)
+## general prerequisites
 
-There are 6 columns:
+All the Python scripts require at least the following package:
 
-- ___job created___ column as timestamp in `%y%m%d-%H%M%S` format
-  - orange for pending jobs
-  - yellow for running jobs
-  - green for successfully completed jobs
-  - red for failed jobs
-- ___combined "job started" and "job finished"___ column, each as 3-digit value in "minutes since job creation" and "minutes since job start" in `NNN·NNN` format
-- ___git reference___ column, limited to 10 chars
-- ___commit hash___ column, short form
-- ___commit message___ column, first line only and limited to 52 chars
-- ___author___ column, limited to 16 chars
+```bash
+pip3 install python-gitlab   # GitLab API
+```
 
-And this is what it looks like with pending and running jobs.
+### configuration file
 
-![foo](/monitor2.png)
-
-## Usage
-
-### Prerequisites
-
-- You need [python-gitlab](https://python-gitlab.readthedocs.io/en/stable/index.html) and [sty](https://sty.mewo.dev/index.html) packages.
-
-  ```bash
-  pip3 install python-gitlab   # GitLab API
-  pip3 install sty             # ANSI control for terminal colors
-  ```
-
-- Terminal with support for ANSI control characters and 256 colors.
-
-### Configuration
-
-Create a file `$HOME/jobmon.ini` to configure:
+All the scripts depend on a configuration file `$XDG_CONFIG_HOME/gitlabci.ini` for credentials:
 
 ```ini
 [gitlab]
 server = https://gitlab.com
 project_id = 1234567
-ci_job = someName
 access_token = secret
-
-[jobmon]
-update = 120
 ```
 
-### Three, two, one ... go
+- You can find the `project_id` in the top left corner of you project's overview page, directly below the title.
+- You need to create a [personal access token](https://docs.gitlab.com/ee/user/profile/personal_access_tokens.html) for `access_token`.
 
-Run the script:
+## Overview
 
-```bash
-./jobmon.py
-```
+### [jobmon](/docs/jobmon.md)
 
-You can also use a custom file/path for your configuration:
+Print a self-updating status page about specific GitLab CI jobs in the terminal.
 
-```bash
-./jobmon.py -f <your configuration file>
-```
-
-## Status
-
-unfinished, work in progress
+![jobmon1](/docs/jobmon1.png)
 
 ## License
 
