@@ -11,9 +11,8 @@ from sty import fg   # pip install sty
 import signal
 import sys
 import argparse
-from common import IniFile
-from common.get_status_color import *
-from common.get_fixed_string import *
+from natter import IniFile
+from common import *
 
 
 def get_project(project_id: str, server: str, token: str):
@@ -58,10 +57,10 @@ def print_jobs(project, job_name: str) -> None:
                           " ",
                           fg(248) + get_minutes_between(job.created_at, job.started_at) + "·"
                           + get_minutes_between(job.started_at, job.finished_at) + fg.rs, " ",
-                          fg(131) + get_fixed_str(pipeline.ref, 10) + fg.rs, " ",
+                          fg(131) + to_fixed_len(pipeline.ref, 10) + fg.rs, " ",
                           fg(205) + job.commit["short_id"] + fg.rs, " ",
-                          fg(33) + get_fixed_str(job.commit["title"], 52) + fg.rs, " ",
-                          fg.li_black + get_fixed_str(job.user["name"], 16) + fg.rs,
+                          fg(33) + to_fixed_len(job.commit["title"], 52) + fg.rs, " ",
+                          fg.da_grey + to_fixed_len(job.user["name"], 16) + fg.rs,
                           sep="")
 
 
@@ -99,21 +98,23 @@ def main():
     args = parser.parse_args()
 
     if args.file is None:
-        gl = IniFile.GitlabIni()           # use default path
+        ini = IniFile("gitlabci.ini")   # use default path
     else:
-        gl = IniFile.GitlabIni(args.file)  # use custom path
+        ini = IniFile(args.file)  # use custom path
 
-    seconds = int(gl["jobmon"]["update"])
+    seconds = int(ini["jobmon"]["update"])
 
     clear_screen()
     while True:
         move_cursor(1, 1)
         dt_now = datetime.now()
-        project = get_project(gl.project_id, gl.server, gl.token)
+        project = get_project(ini["gitlab"]["project_id"],
+                              ini["gitlab"]["server"],
+                              ini["gitlab"]["access_token"])
         print(("this: " + dt_now.strftime("%Y.%m.%d %H:%M:%S") + " --- "
-              + fg(230) + gl["jobmon"]["ci_job"] + fg.rs + " on " + project.web_url).ljust(111))
+              + fg(230) + ini["jobmon"]["ci_job"] + fg.rs + " on " + project.web_url).ljust(111))
         print("".ljust(111))  # empty line
-        print_jobs(project, gl["jobmon"]["ci_job"])
+        print_jobs(project, ini["jobmon"]["ci_job"])
         print("".ljust(111))  # empty line
         print(("next: " + (dt_now + timedelta(seconds=seconds)).strftime("%Y.%m.%d %H:%M:%S")
                + " --- Ctrl+C to exit").ljust(110))

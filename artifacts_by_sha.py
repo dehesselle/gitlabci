@@ -4,9 +4,8 @@
 # https://github.com/dehesselle/gitlabci
 
 import gitlab    # pip install python-gitlab
-from common import IniFile
-from common.get_status_color import *
-from common.get_fixed_string import *
+from natter import IniFile
+from common import *
 from sty import fg   # pip install sty
 import argparse
 
@@ -23,11 +22,11 @@ def get_commit_id(commit) -> str:
 
 
 def main() -> None:
-    ini = IniFile.GitlabIni()   # use default path
+    ini = IniFile("gitlabci.ini")
 
-    gl = gitlab.Gitlab(ini.server, private_token=ini.token)
+    gl = gitlab.Gitlab(ini["gitlab"]["server"], private_token=ini["gitlab"]["access_token"])
 
-    project = gl.projects.get(ini.project_id)
+    project = gl.projects.get(ini["gitlab"]["project_id"])
     commit = project.commits.get(get_commit_sha())
 
     print("-" * 88)
@@ -35,7 +34,7 @@ def main() -> None:
     # print()
     print("commit.id             =", get_commit_id(commit))
     print("commit.title          =", fg(33) + commit.title + fg.rs)
-    print("commit.committer_name =", fg.li_black + commit.committer_name + fg.rs)
+    print("commit.committer_name =", fg.da_grey + commit.committer_name + fg.rs)
     print("commit.committed_date =", commit.committed_date)
     print("-" * 88)
 
@@ -43,9 +42,9 @@ def main() -> None:
 
     for job in pipeline.jobs.list():
         if job.status == "success":
-            print(fg.green + get_fixed_str(job.name, 15) + fg.rs, job.web_url + "/artifacts/download")
+            print(fg.green + to_fixed_len(job.name, 15) + fg.rs, job.web_url + "/artifacts/download")
         else:
-            print(get_status_color(job.status) + get_fixed_str(job.name, 15) + fg.rs, job.status)
+            print(get_status_color(job.status) + to_fixed_len(job.name, 15) + fg.rs, job.status)
 
 
 if __name__ == "__main__":

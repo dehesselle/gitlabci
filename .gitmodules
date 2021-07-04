@@ -1,0 +1,3 @@
+[submodule "natter"]
+	path = natter
+	url = https://github.com/dehesselle/natter
